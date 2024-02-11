@@ -1,27 +1,54 @@
 import os
 import string
-from nltk.stem import PorterStemmer
-from nltk.tokenize import word_tokenize
 import nltk
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+from nltk import pos_tag
+from nltk.corpus import wordnet, stopwords
+import re  # Import regular expressions
+
 nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
+nltk.download('stopwords')
 
 def preprocess(documents):
     with open('stopwords.txt', 'r') as file:
-        stopwords = file.read().splitlines()
+        stopwords_list = file.read().splitlines()
+    stopwords_set = set(stopwords.words('english')).union(set(stopwords_list))
 
     punctuation = set(string.punctuation)
-    punctuation.remove('-')
-    print(punctuation)
+    punctuation.remove('-')  # Keep hyphenated words
 
-    porterStemmer = PorterStemmer()
+    lemmatizer = WordNetLemmatizer()
 
-    for subDoc in documents:
-        text = documents[subDoc].lower()
-        tokens = word_tokenize(text)
-        # Remove punctuation from tokens list
-        tokens = [token for token in tokens if token not in punctuation and not any(char.isdigit() for char in token)]
-        # Stem the words and remove stopwords
-        tokens = [porterStemmer.stem(word) for word in tokens if word not in stopwords]
-        documents[subDoc] = tokens
-        print(documents[subDoc])
+    def get_wordnet_pos(treebank_tag):
+        # Converts treebank tags to wordnet tags.
+        if treebank_tag.startswith('J'):
+            return wordnet.ADJ
+        elif treebank_tag.startswith('V'):
+            return wordnet.VERB
+        elif treebank_tag.startswith('N'):
+            return wordnet.NOUN
+        elif treebank_tag.startswith('R'):
+            return wordnet.ADV
+        else:
+            return wordnet.NOUN  # Default to noun if unknown
 
+    def is_numeric(token):
+        # Returns True if the token is numeric (including numbers with punctuation)
+        return bool(re.search(r'\d', token))
+
+    for doc_id, text in documents.items():
+        tokens = word_tokenize(text.lower())  # Tokenize text
+        # Update the condition to use is_numeric for filtering
+        tokens = [token for token in tokens if not is_numeric(token) and token not in punctuation and token not in {"'s", "``", "''"}]
+        tagged_tokens = pos_tag(tokens)  # Part-of-speech tagging
+        
+        # Lemmatize words with appropriate POS tag
+        lemmatized_tokens = [lemmatizer.lemmatize(word, get_wordnet_pos(tag)) for word, tag in tagged_tokens]
+        
+        # Remove stopwords after lemmatization
+        final_tokens = [token for token in lemmatized_tokens if token not in stopwords_set]
+        
+        documents[doc_id] = final_tokens

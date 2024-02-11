@@ -41,6 +41,9 @@ for file in os.listdir('testing'):
 preprocessing.preprocess(documents)
 
 print(documents["AP880212-0001"])
-# invertedIndex = indexing(tokens)
+# print(documents)
+
+invertedIndex = indexing.createInvertedIndex(documents)
+print(invertedIndex)
 
 # retrievalandranking(invertedIndex)

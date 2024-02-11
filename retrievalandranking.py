@@ -58,7 +58,7 @@ def retrieve_and_rank(query, index, idf, lengths_of_docs, total_num_docs):
     return doc_scores
 
 # Call the function to retrieve and rank documents
-document_scores = retrieve_and_rank(query, inverted_index, idf_scores, doc_lengths, total_docs)
+# document_scores = retrieve_and_rank(query, inverted_index, idf_scores, doc_lengths, total_docs)
 
 # Sort the documents based on their scores in descending order
-sorted_documents = sorted(document_scores.items(), key=lambda item: item[1], reverse=True)
+# sorted_documents = sorted(document_scores.items(), key=lambda item: item[1], reverse=True)

@@ -28,8 +28,8 @@ def extractSubDocuments(docContent):
 
     return documents
 
-for file in os.listdir('coll'):
-    filepath = 'coll/' + file
+for file in os.listdir('testing'):
+    filepath = 'testing/' + file
     if os.path.isfile(filepath):
         with open(filepath, 'r') as file:
             documents.update(extractSubDocuments(file.read()))

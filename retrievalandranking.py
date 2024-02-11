@@ -1,5 +1,46 @@
-from collections import defaultdict
 import math
+from collections import defaultdict
+from math import log
+
+def compute_idf(inverted_index, numDocs):
+    idf_scores = {}
+    for term, docs in inverted_index.items():
+        # The number of documents containing the term is the length of the docs list
+        doc_freq = len(docs)
+        # Use the IDF formula as specified
+        idf_scores[term] = log(numDocs / doc_freq, 10)
+    
+    return idf_scores
+
+def compute_tf_idf(inverted_index, idf_scores, num_docs):
+    tf_idf_scores = {}
+
+    for term, doc_dict in inverted_index.items():
+        for doc_id, term_freq in doc_dict.items():
+            # The Term Frequency is the raw count of how many times a word occurs in a document in this case
+            # Retrieve the corresponding IDF score for that term
+            idf = idf_scores.get(term, log(num_docs, 10))  # Default IDF if term is not found
+            # Calculate TF-IDF score
+            tf_idf = term_freq * idf
+            # Initialize a nested dictionary if necessary
+            if doc_id not in tf_idf_scores:
+                tf_idf_scores[doc_id] = {}
+            # Assign the TF-IDF score to the term for this document
+            tf_idf_scores[doc_id][term] = tf_idf
+
+    return tf_idf_scores
+
+import math
+
+def compute_document_lengths(tfidfScores):
+    doc_lengths = {}
+
+    for doc_id, scores in tfidfScores.items():
+        # Calculate the square root of the sum of the squares of TF-IDF scores for the document
+        length = math.sqrt(sum(tfidf**2 for tfidf in scores.values()))
+        doc_lengths[doc_id] = length
+
+    return doc_lengths
 
 # Function to convert the query into its vector representation using term frequency and inverse document frequency.
 def build_query_vector(query_terms, idf_values, docs_count):

@@ -39,11 +39,23 @@ for file in os.listdir('testing'):
 # print(documents["AP881120-0001"][:10])
 
 preprocessing.preprocess(documents)
-
-print(documents["AP880212-0001"])
+# print(documents["AP880212-0001"])
 # print(documents)
 
 invertedIndex = indexing.createInvertedIndex(documents)
-print(invertedIndex)
+# print(invertedIndex)
 
-# retrievalandranking(invertedIndex)
+numDocs = len(documents)
+print(numDocs)
+
+idfScores = retrievalandranking.compute_idf(invertedIndex, numDocs)
+# print(idfScores)
+print(len(idfScores))
+
+tfidfScores = retrievalandranking.compute_tf_idf(invertedIndex, idfScores, numDocs)
+# print(tfidfScores["AP880212-0045"])
+print(len(tfidfScores))
+
+documentLengths = retrievalandranking.compute_document_lengths(tfidfScores)
+print(documentLengths)
+print(len(documentLengths))

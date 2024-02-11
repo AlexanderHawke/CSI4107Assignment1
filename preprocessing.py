@@ -4,18 +4,16 @@ import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from nltk import pos_tag
-from nltk.corpus import wordnet, stopwords
+from nltk.corpus import wordnet
 import re  # Import regular expressions
 
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('wordnet')
-nltk.download('stopwords')
 
 def preprocess(documents):
     with open('stopwords.txt', 'r') as file:
-        stopwords_list = file.read().splitlines()
-    stopwords_set = set(stopwords.words('english')).union(set(stopwords_list))
+        stopwords = file.read().splitlines()
 
     punctuation = set(string.punctuation)
     punctuation.remove('-')  # Keep hyphenated words
@@ -49,6 +47,6 @@ def preprocess(documents):
         lemmatized_tokens = [lemmatizer.lemmatize(word, get_wordnet_pos(tag)) for word, tag in tagged_tokens]
         
         # Remove stopwords after lemmatization
-        final_tokens = [token for token in lemmatized_tokens if token not in stopwords_set]
+        final_tokens = [token for token in lemmatized_tokens if token not in stopwords]
         
         documents[doc_id] = final_tokens
